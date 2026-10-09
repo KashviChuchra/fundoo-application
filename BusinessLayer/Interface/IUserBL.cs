@@ -1,4 +1,5 @@
-﻿using ModelLayer;
+﻿using ModelLayer.Request;
+using ModelLayer.Response;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,8 +8,8 @@ namespace BusinessLayer.Interface
 {
     public interface IUserBL
     {
-        RegistrationModel RegisterUserBL(RegistrationModel registrationModel);
-        LoginResponseModel LoginUserBL(LoginModel loginModel);
+        Task<ResponseModel<string>> RegisterUserBL(RegistrationModel registrationModel);
+        Task<ResponseModel<LoginResponseModel>> LoginUserBL(LoginModel loginModel);
 
     }
 }

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace RepositoryLayer.Entity
 {
@@ -18,7 +19,6 @@ namespace RepositoryLayer.Entity
         public string LastName { get; set; } = string.Empty;
 
         [Required]
-       // [Index(IsUnique = true)] // to make sure that email is unique
         public string Email { get; set; } = string.Empty;
 
         [Required]
@@ -26,13 +26,8 @@ namespace RepositoryLayer.Entity
 
         public string PhoneNumber { get; set; } = string.Empty;
 
-        // Adding forgot-reset password
-        public string? ResetToken { get; set; }
-
-        public DateTime? ResetTokenExpiry { get; set; }
-
-        public bool IsResetTokenUsed { get; set; }
-
+        public ICollection<PasswordResetTokenEntity> PasswordResetTokenEntities { get; set; }= new List<PasswordResetTokenEntity>();
+        //One user can have many password-reset tokens.
     }
 }
 

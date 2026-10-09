@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/Fundoo-MAIN/">
+    <Project Path="BusinessLayer/BusinessLayer.csproj" />
+    <Project Path="FunDo/FunDo.csproj" />
+    <Project Path="ModelLayer/ModelLayer.csproj" />
+    <Project Path="Repository/RepositoryLayer.csproj" />
+  </Folder>
+  <Folder Name="/Fundoo-MessagingService/">
+    <Project Path="MessagingService/MessagingService.csproj" />
+    <Project Path="MessagingService_BusinessLayer/MessagingService_BusinessLayer.csproj" />
+    <Project Path="MessagingService_ModelLayer/MessagingService_ModelLayer.csproj" />
+  </Folder>
+</Solution>

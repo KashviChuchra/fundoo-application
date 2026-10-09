@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace ModelLayer
+namespace ModelLayer.Request
 {
-    public class ForgotPasswordModel
+    public class ForgotPasswordRequest
     {
         [Required(ErrorMessage ="Email is Required")]
         [EmailAddress(ErrorMessage ="Email is not valid")]

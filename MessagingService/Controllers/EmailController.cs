@@ -16,11 +16,16 @@ namespace MessagingService.Controllers
         }
 
         [HttpPost("send")]
-        public async Task<IActionResult> SendEmail(EmailModel emailModel)
+        public async Task<IActionResult> SendEmail(
+            [FromBody] EmailModel emailModel)
         {
-            await _emailBL.SendEmailAsync(emailModel);
+            await _emailBL.SendEmailAsync(emailModel); 
 
-            return Ok("Email sent successfully");
+            return Ok(new
+            {
+                Success = true,
+                Message = "Email sent successfully."
+            });
         }
     }
 }

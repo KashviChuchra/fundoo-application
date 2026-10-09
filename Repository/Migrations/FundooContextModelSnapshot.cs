@@ -22,6 +22,37 @@ namespace RepositoryLayer.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("RepositoryLayer.Entity.PasswordResetTokenEntity", b =>
+                {
+                    b.Property<int>("ResetTokenId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ResetTokenId"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("ExpiryTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ResetTokenId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PasswordResetTokens");
+                });
+
             modelBuilder.Entity("RepositoryLayer.Entity.UserEntity", b =>
                 {
                     b.Property<int>("UserId")
@@ -38,9 +69,6 @@ namespace RepositoryLayer.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<bool>("IsResetTokenUsed")
-                        .HasColumnType("boolean");
-
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("text");
@@ -53,15 +81,25 @@ namespace RepositoryLayer.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("ResetToken")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime?>("ResetTokenExpiry")
-                        .HasColumnType("timestamp with time zone");
-
                     b.HasKey("UserId");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("RepositoryLayer.Entity.PasswordResetTokenEntity", b =>
+                {
+                    b.HasOne("RepositoryLayer.Entity.UserEntity", "User")
+                        .WithMany("PasswordResetTokenEntities")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("RepositoryLayer.Entity.UserEntity", b =>
+                {
+                    b.Navigation("PasswordResetTokenEntities");
                 });
 #pragma warning restore 612, 618
         }

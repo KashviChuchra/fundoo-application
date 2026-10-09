@@ -1,13 +1,14 @@
 ﻿using BusinessLayer.Interface;
 using RepositoryLayer.Interface;
-using ModelLayer;
+using ModelLayer.Request;
+using ModelLayer.Response;
 
 
 namespace BusinessLayer.Service
 {
     public class UserBL:IUserBL
     {
-        private IUserRL _userRL;
+        private readonly IUserRL _userRL;
         private readonly IJwtService _jwtService;
 
         public UserBL(IUserRL userRL, IJwtService jwtService)
@@ -16,19 +17,30 @@ namespace BusinessLayer.Service
             _jwtService = jwtService;
 
         }
-        public RegistrationModel RegisterUserBL(RegistrationModel registrationModel)
+        public async Task<ResponseModel<string>> RegisterUserBL(RegistrationModel registrationModel)
         {
-            return _userRL.RegisterUserRL(registrationModel);
+            return await _userRL.RegisterUserRL(registrationModel);
         }
-        public LoginResponseModel LoginUserBL(LoginModel loginModel)
+        public async Task<ResponseModel<LoginResponseModel>> LoginUserBL(LoginModel loginModel)
         {
-            var user = _userRL.LoginUserRL(loginModel);
-            var token = _jwtService.GenerateToken(
-              user.UserId,
-              user.Email
-            );
+            var response = await _userRL.LoginUserRL(loginModel);
+            if (!response.Success || response.Data==null)
+            {
+                return response;
+            }
+
+            var user = response.Data;
+
+            var token = _jwtService.GenerateToken(user.UserId, user.Email);
+
             user.Token = token;
-            return user;
+
+            return new ResponseModel<LoginResponseModel>
+            {
+                Success = true,
+                Message = "Login successful",
+                Data = user
+            };
         }
 
 

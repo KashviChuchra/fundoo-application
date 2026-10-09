@@ -1,0 +1,44 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Build output
+bin/
+obj/
+
+# User-specific files
+*.user
+*.rsuser
+
+# Test results
+TestResults/
+*.trx
+
+# NuGet
+packages/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment / secrets
+.env
+appsettings.Development.json
+
+# Rider
+.idea/
+
+# Visual Studio Code
+.vscode/
+
+
+
+# User Secrets
+secrets.json
+
+# Local configuration
+appsettings.Development.json

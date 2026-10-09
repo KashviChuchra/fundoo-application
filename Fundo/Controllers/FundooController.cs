@@ -1,6 +1,7 @@
-using Microsoft.AspNetCore.Mvc;
 using BusinessLayer.Interface;
-using ModelLayer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using ModelLayer.Request;
 namespace FunDo.Controllers
 {
 
@@ -17,17 +18,32 @@ namespace FunDo.Controllers
         
 
         [HttpPost]
-        public IActionResult RegisterUser(RegistrationModel registrationModel)
+        public async Task<IActionResult> RegisterUser([FromBody] RegistrationModel registrationModel)
         {
-            _userBL.RegisterUserBL(registrationModel);
-            return Ok("Registration successful");
+            var response = await _userBL.RegisterUserBL(registrationModel);
+            if (!response.Success) 
+            { 
+                return Conflict(response); 
+            }
+            return Ok(response);
         }
 
         [HttpPost("login")]
-        public IActionResult LoginUser(LoginModel loginModel)
+        public async Task<IActionResult> LoginUser([FromBody] LoginModel loginModel)
         {
-            var result=_userBL.LoginUserBL(loginModel);
-            return Ok(result);
+            var response = await _userBL.LoginUserBL(loginModel); 
+            if (!response.Success) 
+            { 
+                return Unauthorized(response); 
+            }
+            return Ok(response);
+        }
+
+        [Authorize]
+        [HttpGet("protected")]
+        public IActionResult ProtectedEndpoint()
+        {
+            return Ok("You are authorized!");
         }
 
     }

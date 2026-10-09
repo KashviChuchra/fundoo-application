@@ -1,5 +1,4 @@
-﻿using ModelLayer;
-using RepositoryLayer.Context;
+﻿using RepositoryLayer.Context;
 using RepositoryLayer.Entity;
 using RepositoryLayer.Interface;
 using System;
@@ -7,20 +6,34 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
+using ModelLayer.Request;
+using ModelLayer.Response;
 
 
 namespace RepositoryLayer.Service
 {
     public class UserRL : IUserRL
     {
-        private FundooContext fundooContext;
+        private FundooContext _fundooContext;
         public UserRL(FundooContext fundooContext)
         {
-            this.fundooContext = fundooContext;
+            _fundooContext = fundooContext;
         }
 
-        public RegistrationModel RegisterUserRL(RegistrationModel registrationModel)
+        public async Task<ResponseModel<string>> RegisterUserRL(RegistrationModel registrationModel)
         {
+
+            var exisitingUser = await _fundooContext.Users.FirstOrDefaultAsync(user => user.Email == registrationModel.Email);
+            if (exisitingUser != null)
+            {
+                return new ResponseModel<string>
+                {
+                    Success = false,
+                    Message = "An account with this email already exists",
+                    Data = null
+                };
+            }
+            
             UserEntity userEntity = new UserEntity();
             //UserEntity userEntity1 = new UserEntity();
 
@@ -31,54 +44,47 @@ namespace RepositoryLayer.Service
             userEntity.PhoneNumber = registrationModel.ContactNo;
 
 
-            fundooContext.Users.Add(userEntity);
+            await _fundooContext.Users.AddAsync(userEntity);
             //fundooContext.Users.Add(userEntity1);
 
-            var result =fundooContext.SaveChanges();
+            var result =await _fundooContext.SaveChangesAsync();
             // returns no of rows affeted in result
+
             Console.WriteLine("Result: " + result);
-            return registrationModel;
-        }
 
-        public LoginResponseModel LoginUserRL(LoginModel loginModel)
-        {
-            var user= fundooContext.Users.FirstOrDefault(c => c.Email == loginModel.Email);
-            if (user == null)
+            return new ResponseModel<string>
             {
-                throw new Exception("Invalid email or password");
-            }
-            bool isPasswordValid =BCrypt.Net.BCrypt.Verify(loginModel.Password, user.Password);
-            if (!isPasswordValid)
-            {
-                throw new Exception("Invalid email or password");
-
-            }
-            return new LoginResponseModel
-            {
-                UserId = user.UserId,
-                Email = user.Email
+                Success = true,
+                Message = "Registration successful",
+                Data = null
             };
         }
 
-        public async Task<bool> ForgotPassword(ForgotPasswordModel forgotPasswordModel)
+        public async Task<ResponseModel<LoginResponseModel>> LoginUserRL(LoginModel loginModel)
         {
-            var user = await fundooContext.Users.FirstOrDefaultAsync(x => x.Email == forgotPasswordModel.Email);
-            if (user == null)
+            var user= await _fundooContext.Users.FirstOrDefaultAsync(c => c.Email == loginModel.Email);
+            if (user == null || !BCrypt.Net.BCrypt.Verify(loginModel.Password, user.Password))
             {
-                return false;
+                return new ResponseModel<LoginResponseModel>
+                {
+                    Success = false,
+                    Message = "Invalid email or password",
+                    Data = null
+                };
             }
-            // Gennerate reset token
-            var resetToken = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
-            user.ResetToken = resetToken;
-            user.ResetTokenExpiry = DateTime.UtcNow.AddMinutes(15);
-            user.IsResetTokenUsed = false;
-            await fundooContext.SaveChangesAsync();
-
-            return true;
+            
+            return new ResponseModel<LoginResponseModel>
+            {
+                Success = true,
+                Message = "Login successful",
+                Data = new LoginResponseModel
+                {
+                    UserId = user.UserId,
+                    Email = user.Email,
+                }
+            };
         }
-
-
-
+       
         // we can save multiple etities
         // why need? --> eg=? with, sqlpulp
         // multiple transactions? ado.net not preffered

@@ -14,7 +14,9 @@ namespace RepositoryLayer.Context
         {
 
         }
-        public DbSet<UserEntity> Users { get; set; }
+        public DbSet<UserEntity> Users { get; set; } = null!;
+        public DbSet<PasswordResetTokenEntity> PasswordResetTokens { get; set; } = null!;
+
     }
 }
 
