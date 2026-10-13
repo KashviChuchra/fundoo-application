@@ -1,7 +1,7 @@
 using BusinessLayer.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ModelLayer.Request;
+using ModelLayer.Request.UserRequest;
 namespace FunDo.Controllers
 {
 
@@ -43,7 +43,13 @@ namespace FunDo.Controllers
         [HttpGet("protected")]
         public IActionResult ProtectedEndpoint()
         {
-            return Ok("You are authorized!");
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            return Ok(new
+            {
+                Message = "You are authorized!",
+                UserId = userId
+            });
         }
 
     }

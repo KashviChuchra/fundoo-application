@@ -1,7 +1,7 @@
 ﻿using BusinessLayer.Interface;
 using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;  // jwt token
+using System.IdentityModel.Tokens.Jwt; // jwt token
 using System.Security.Claims;
 using System.Text;
 
@@ -24,8 +24,8 @@ namespace BusinessLayer.Service
 
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key!));
 
-            var credentials = new SigningCredentials(securityKey,SecurityAlgorithms.HmacSha256
-            );
+            var credentials = new SigningCredentials(securityKey,SecurityAlgorithms.HmacSha256);
+            // strong random key of at least 256 bits (32 bytes).
 
             var claims = new[]
             {

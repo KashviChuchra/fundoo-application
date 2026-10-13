@@ -1,7 +1,7 @@
 ﻿using BusinessLayer.Interface;
 using RepositoryLayer.Interface;
-using ModelLayer.Request;
 using ModelLayer.Response;
+using ModelLayer.Request.UserRequest;
 
 
 namespace BusinessLayer.Service

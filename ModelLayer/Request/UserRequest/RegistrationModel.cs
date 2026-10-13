@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ModelLayer.Request
+namespace ModelLayer.Request.UserRequest
 {
     public class RegistrationModel
     {

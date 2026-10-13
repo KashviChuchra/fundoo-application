@@ -5,10 +5,10 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using BusinessLayer.Interface;
-using ModelLayer.Request;
 using ModelLayer.Response;
 using RepositoryLayer.Entity;
 using RepositoryLayer.Interface;
+using ModelLayer.Request.UserRequest;
 
 namespace BusinessLayer.Service
 {

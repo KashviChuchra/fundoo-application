@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace ModelLayer.Request
+namespace ModelLayer.Request.UserRequest
 {
     public class ForgotPasswordRequest
     {

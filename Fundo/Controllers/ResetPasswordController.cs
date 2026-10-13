@@ -1,6 +1,6 @@
 ﻿using BusinessLayer.Interface;
 using Microsoft.AspNetCore.Mvc;
-using ModelLayer.Request;
+using ModelLayer.Request.UserRequest;
 
 namespace FunDo.Controllers
 {

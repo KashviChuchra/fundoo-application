@@ -1,4 +1,4 @@
-﻿using ModelLayer.Request;
+﻿using ModelLayer.Request.UserRequest;
 using ModelLayer.Response;
 
 namespace BusinessLayer.Interface
