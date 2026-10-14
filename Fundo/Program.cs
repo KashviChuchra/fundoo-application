@@ -28,11 +28,15 @@ namespace FunDo
             builder.Services.AddScoped<IUserBL, UserBL>();
             builder.Services.AddScoped<IForgotPasswordBL, ForgotPasswordBL>();
             builder.Services.AddScoped<IResetPasswordBL, ResetPasswordBL>();
+            // Note business layer
+            builder.Services.AddScoped<INoteBL, NoteBL>();
 
             // Repository Layer
             builder.Services.AddScoped<IUserRL, UserRL>();
             builder.Services.AddScoped<IForgotPasswordRL, ForgotPasswordRL>();
             builder.Services.AddScoped<IResetPasswordRL, ResetPasswordRL>();
+            // Note repository layer
+            builder.Services.AddScoped<INoteRL, NoteRL>();
 
 
             // JWT Service

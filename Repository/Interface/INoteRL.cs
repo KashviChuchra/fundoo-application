@@ -16,8 +16,7 @@ namespace RepositoryLayer.Interface
         Task<List<NoteEntity>> ViewNotesAsync(int userId);
         Task<NoteEntity?> ViewNotesByIdAsync(NoteIdRequest note, int userId);
         Task<NoteEntity?> EditNotesByIdAsync(EditNoteRequest note, int userId);
-        Task<bool> DeleteNotesByIdAsync(NoteIdRequest note, int userId);
+        Task<NoteEntity?> DeleteNotesByIdAsync(NoteIdRequest note, int userId);
         Task<NoteEntity?> ArchiveNoteAsync(NoteIdRequest noteId, int userId);
-        Task<NoteEntity?> TrashUnTrashNoteAsync(NoteIdRequest noteId, int userId);
     }
 }

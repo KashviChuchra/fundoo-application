@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using ModelLayer.Request.NoteRequest;
 using ModelLayer.Response;
 using ModelLayer.Response.NoteResponse;
+using System.Security.Claims;
 
 namespace FunDo.Controllers
 {
@@ -14,70 +15,110 @@ namespace FunDo.Controllers
     public class NoteController: ControllerBase
     {
         private readonly INoteBL _noteBL;
+        private const string UserIdClaim = ClaimTypes.NameIdentifier;
         public NoteController(INoteBL noteBL)
         {
             _noteBL = noteBL;
         }
 
-        [HttpPost("add-note")]
-        public Task<ActionResult<ResponseModel<NoteModelResponse>>> AddNote([FromBody]NoteCreationRequest note)
+        [HttpPost("create-note")]
+        public async Task<ActionResult<ResponseModel<NoteModelResponse>>> AddNote([FromBody]NoteCreationRequest note)
         {
-            //if(!TryGetUserId(out int userId))
-            //{
-            //    return Unauthorized(new ResponseModel<NoteModelResponse>
-            //    {
-            //        Success = false,
-            //        Message = "Invalid user identity",
-            //        Data = null
-            //    });
-            //}
-            //var result = await _noteBL.AddNoteAsync(note, userId);
+            if (!TryGetUserId(out int userId))
+            {
+                return Unauthorized();
+            }
+            var result = await _noteBL.AddNoteAsync(note, userId);
 
-            //if (!result.Success)
-            //{
-            //    return BadRequest(result);
-            //}
+            if (!result.Success)
+            {
+                return BadRequest(result);
+            }
 
-            //return StatusCode(StatusCodes.Status201Created, result);
-            throw new NotImplementedException();
+            return StatusCode(StatusCodes.Status201Created, result);
+        }
 
+        [HttpGet("view-notes")]
+        public async Task<ActionResult<ResponseModel<List<NoteModelResponse>>>> ViewNote()
+        {
+            if (!TryGetUserId(out var userId))
+            {
+                return Unauthorized(); 
+            }
+            var result = await _noteBL.ViewNotesAsync(userId);
+            return Ok(result);
         }
 
         [HttpGet("view-note")]
-        public Task<ActionResult<ResponseModel<NoteModelResponse>>> ViewNote()
+        public async Task<ActionResult<ResponseModel<NoteModelResponse>>> ViewNoteById([FromQuery] int noteId)
         {
-            throw new NotImplementedException();
+            if (!TryGetUserId(out var userId))
+            {
+                return Unauthorized();
+            }
+            var note = new NoteIdRequest { NoteId = noteId };
 
+            var result = await _noteBL.ViewNotesByIdAsync(note, userId);
+
+            if (!result.Success)    return NotFound(result);
+
+            return Ok(result);
         }
 
-        [HttpGet("view-note/{user_id}")]
-        public Task<ActionResult<ResponseModel<NoteModelResponse>>> ViewNoteById(NoteIdRequest note)
+        [HttpPut("edit-note")]
+        public async Task<ActionResult<ResponseModel<NoteModelResponse>>> EditNoteById([FromBody]EditNoteRequest note)
         {
-            throw new NotImplementedException();
+            if (!TryGetUserId(out var userId))
+            {
+                return Unauthorized();
+            }
+            var result = await _noteBL.EditNotesByIdAsync(note, userId);
+
+            if (!result.Success)
+                return NotFound(result);
+
+            return Ok(result);
 
         }
-
-        [HttpGet("edit-note/{user_id}")]
-        public Task<ActionResult<ResponseModel<NoteModelResponse>>> EditNoteById(EditNoteRequest note)
+        [HttpDelete("delete-note")]
+        public async Task<ActionResult<ResponseModel<NoteModelResponse>>> DeleteNoteById([FromBody]NoteIdRequest note)
         {
-            throw new NotImplementedException();
+            if (!TryGetUserId(out var userId))
+            {
+                return Unauthorized();
+            }
+            var result = await _noteBL.DeleteNotesByIdAsync(note, userId);
 
+            if (!result.Success)
+                return NotFound(result);
+
+            return Ok(result);
         }
-        public Task<ActionResult<ResponseModel<NoteModelResponse>>> DeleteNoteById(NoteIdRequest note)
+        
+        [HttpPut("archive-note")]
+        public async Task<ActionResult<ResponseModel<NoteModelResponse>>> ArchieveNoteById([FromBody] NoteIdRequest note)
         {
-            throw new NotImplementedException();
+            if (!TryGetUserId(out var userId))
+            {
+                return Unauthorized();
+            }
+            var result = await _noteBL.ArchiveNoteAsync(note, userId);
 
+            if (!result.Success)
+                return NotFound(result);
+
+            return Ok(result);
         }
-        public Task<ActionResult<ResponseModel<NoteModelResponse>>> ArchieveNote()
+
+        //public Task<ActionResult<ResponseModel<NoteModelResponse>>> TrashUnTrash()
+        //{
+        //    throw new NotImplementedException();
+
+        //}
+
+        private bool TryGetUserId(out int userId)
         {
-            throw new NotImplementedException();
-
+            return int.TryParse(User.FindFirstValue(UserIdClaim), out userId);
         }
-        public Task<ActionResult<ResponseModel<NoteModelResponse>>> TrashUnTrash()
-        {
-            throw new NotImplementedException();
-
-        }
-
     }
 }

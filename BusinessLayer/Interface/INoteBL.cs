@@ -17,6 +17,5 @@ namespace BusinessLayer.Interface
         Task<ResponseModel<NoteModelResponse>> EditNotesByIdAsync(EditNoteRequest note, int userId);
         Task<ResponseModel<NoteModelResponse>> DeleteNotesByIdAsync(NoteIdRequest note, int userId);
         Task<ResponseModel<NoteModelResponse>> ArchiveNoteAsync(NoteIdRequest noteId, int userId);
-        Task<ResponseModel<NoteModelResponse>> TrashUnTrashNoteAsync(NoteIdRequest noteId, int userId);
     }
 }
