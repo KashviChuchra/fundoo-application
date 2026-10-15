@@ -1,5 +1,5 @@
 ﻿using ModelLayer.Request.UserRequest;
-using ModelLayer.Response;
+using ModelLayer.Response.UserResponse;
 using RepositoryLayer.Entity;
 using System;
 using System.Collections.Generic;
@@ -11,5 +11,8 @@ namespace RepositoryLayer.Interface
     {
         Task<ResponseModel<string>> RegisterUserRL(RegistrationModel registrationModel);
         Task<ResponseModel<LoginResponseModel>> LoginUserRL(LoginModel loginModel);
+        Task<UserEntity?> GetUserByEmailAsync(string email);
+        Task<bool> UpdatePasswordAsync(int userId, string passwordHash);
+
     }
 }

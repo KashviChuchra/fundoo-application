@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using ModelLayer.Request.NoteRequest;
-using ModelLayer.Response;
 using ModelLayer.Response.NoteResponse;
+using ModelLayer.Response.UserResponse;
 using System.Security.Claims;
 
 namespace FunDo.Controllers
@@ -14,10 +14,12 @@ namespace FunDo.Controllers
     [Route("api/[controller]")]
     public class NoteController: ControllerBase
     {
+        private readonly ILogger<NoteController> _logger;
         private readonly INoteBL _noteBL;
         private const string UserIdClaim = ClaimTypes.NameIdentifier;
-        public NoteController(INoteBL noteBL)
+        public NoteController(ILogger<NoteController> logger, INoteBL noteBL)
         {
+            _logger = logger;
             _noteBL = noteBL;
         }
 
@@ -26,16 +28,31 @@ namespace FunDo.Controllers
         {
             if (!TryGetUserId(out int userId))
             {
+                _logger.LogWarning("AddNote rejected: user id claim missing or invalid in token");
                 return Unauthorized();
             }
-            var result = await _noteBL.AddNoteAsync(note, userId);
+            _logger.LogInformation("AddNote started for user {UserId}", userId);
 
-            if (!result.Success)
+            try
             {
-                return BadRequest(result);
+                var result = await _noteBL.AddNoteAsync(note, userId);
+
+                if (!result.Success)
+                {
+                    _logger.LogWarning("AddNote failed for user {UserId}: BL returned Success=false", userId);
+                    return BadRequest(result);
+                }
+
+                _logger.LogInformation("AddNote succeeded for user {UserId}", userId);
+                return StatusCode(StatusCodes.Status201Created, result);
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, "AddNote crashed unexpectedly for user {UserId}", userId);
+                return StatusCode(StatusCodes.Status500InternalServerError, "Something went wrong while creating the note.");
             }
 
-            return StatusCode(StatusCodes.Status201Created, result);
+
         }
 
         [HttpGet("view-notes")]

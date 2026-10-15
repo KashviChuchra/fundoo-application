@@ -1,92 +1,111 @@
-﻿using RepositoryLayer.Context;
+﻿
+using BCrypt.Net;
+using Microsoft.EntityFrameworkCore;
+using ModelLayer.Request.UserRequest;
+using ModelLayer.Response.UserResponse;
+using RepositoryLayer.Context;
 using RepositoryLayer.Entity;
 using RepositoryLayer.Interface;
-using System;
-using System.Collections.Generic;
-using System.Security.Cryptography;
-using System.Text;
-using Microsoft.EntityFrameworkCore;
-using ModelLayer.Response;
-using ModelLayer.Request.UserRequest;
-
 
 namespace RepositoryLayer.Service
 {
     public class UserRL : IUserRL
     {
-        private FundooContext _fundooContext;
+        private readonly FundooContext _fundooContext;
+
         public UserRL(FundooContext fundooContext)
         {
             _fundooContext = fundooContext;
         }
 
-        public async Task<ResponseModel<string>> RegisterUserRL(RegistrationModel registrationModel)
+        public async Task<ResponseModel<string>> RegisterUserRL(
+            RegistrationModel registrationModel)
         {
+            var email = registrationModel.Email.Trim();
 
-            var exisitingUser = await _fundooContext.Users.FirstOrDefaultAsync(user => user.Email == registrationModel.Email);
-            if (exisitingUser != null)
+            var existingUser = await _fundooContext.Users
+                .FirstOrDefaultAsync(user => user.Email == email);
+
+            if (existingUser != null)
             {
                 return new ResponseModel<string>
                 {
                     Success = false,
-                    Message = "An account with this email already exists",
-                    Data = null
+                    Message = "An account with this email already exists."
                 };
             }
-            
-            UserEntity userEntity = new UserEntity();
-            //UserEntity userEntity1 = new UserEntity();
 
-            userEntity.FirstName = registrationModel.FirstName;
-            userEntity.LastName = registrationModel.LastName;
-            userEntity.Email = registrationModel.Email;
-            userEntity.Password = BCrypt.Net.BCrypt.HashPassword(registrationModel.Password);
-            userEntity.PhoneNumber = registrationModel.ContactNo;
+            var user = new UserEntity
+            {
+                FirstName = registrationModel.FirstName,
+                LastName = registrationModel.LastName,
+                Email = email,
+                Password = BCrypt.Net.BCrypt.HashPassword(registrationModel.Password),
+                PhoneNumber = registrationModel.ContactNo
+            };
 
-
-            await _fundooContext.Users.AddAsync(userEntity);
-            //fundooContext.Users.Add(userEntity1);
-
-            var result =await _fundooContext.SaveChangesAsync();
-            // returns no of rows affeted in result
-
-            Console.WriteLine("Result: " + result);
+            await _fundooContext.Users.AddAsync(user);
+            await _fundooContext.SaveChangesAsync();
 
             return new ResponseModel<string>
             {
                 Success = true,
-                Message = "Registration successful",
-                Data = null
+                Message = "User registered successfully.",
+                Data = "Registration successful."
             };
         }
 
-        public async Task<ResponseModel<LoginResponseModel>> LoginUserRL(LoginModel loginModel)
+        public async Task<ResponseModel<LoginResponseModel>> LoginUserRL(
+            LoginModel loginModel)
         {
-            var user= await _fundooContext.Users.FirstOrDefaultAsync(c => c.Email == loginModel.Email);
+            var email = loginModel.Email.Trim();
+
+            var user = await _fundooContext.Users
+                .FirstOrDefaultAsync(user => user.Email == email);
+
             if (user == null || !BCrypt.Net.BCrypt.Verify(loginModel.Password, user.Password))
             {
                 return new ResponseModel<LoginResponseModel>
                 {
                     Success = false,
-                    Message = "Invalid email or password",
-                    Data = null
+                    Message = "Invalid email or password."
                 };
             }
-            
+
             return new ResponseModel<LoginResponseModel>
             {
                 Success = true,
-                Message = "Login successful",
+                Message = "Login successful.",
                 Data = new LoginResponseModel
                 {
                     UserId = user.UserId,
-                    Email = user.Email,
+                    Email = user.Email
                 }
             };
         }
-       
-        // we can save multiple etities
-        // why need? --> eg=? with, sqlpulp
-        // multiple transactions? ado.net not preffered
+
+        public async Task<UserEntity?> GetUserByEmailAsync(string email)
+        {
+            email = email.Trim();
+
+            return await _fundooContext.Users
+                .FirstOrDefaultAsync(user => user.Email == email);
+        }
+
+        public async Task<bool> UpdatePasswordAsync(
+            int userId, string passwordHash)
+        {
+            var user = await _fundooContext.Users
+                .FirstOrDefaultAsync(user => user.UserId == userId);
+
+            if (user == null)
+                return false;
+
+            user.Password = passwordHash;
+
+            await _fundooContext.SaveChangesAsync();
+
+            return true;
+        }
     }
 }

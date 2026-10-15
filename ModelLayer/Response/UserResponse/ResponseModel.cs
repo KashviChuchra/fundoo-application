@@ -4,11 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModelLayer.Response
+namespace ModelLayer.Response.UserResponse
 {
-    public class ResetPasswordResponse
+    public class ResponseModel<T>
     {
         public bool Success { get; set; }
         public string Message { get; set; } = string.Empty;
+        public T? Data { get; set; }
+
     }
 }

@@ -38,6 +38,25 @@ namespace FunDo.Controllers
             }
             return Ok(response);
         }
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPasswordAsync(
+            [FromBody] ForgotPasswordRequest request)
+        {
+            var response = await _userBL.ForgotPasswordAsync(request);
+            return Ok(response);
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPasswordAsync(
+            [FromBody] ResetPasswordRequest request)
+        {
+            var response = await _userBL.ResetPasswordAsync(request);
+
+            if (!response.Success)
+                return BadRequest(response);
+
+            return Ok(response);
+        }
 
         [Authorize]
         [HttpGet("protected")]

@@ -1,6 +1,6 @@
 ﻿using ModelLayer.Request.NoteRequest;
-using ModelLayer.Response;
 using ModelLayer.Response.NoteResponse;
+using ModelLayer.Response.UserResponse;
 using System;
 using System.Collections.Generic;
 using System.Linq;

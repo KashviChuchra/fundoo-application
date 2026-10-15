@@ -26,8 +26,6 @@ namespace RepositoryLayer.Entity
 
         public string PhoneNumber { get; set; } = string.Empty;
 
-        public ICollection<PasswordResetTokenEntity> PasswordResetTokenEntities { get; set; }= new List<PasswordResetTokenEntity>();
-        //One user can have many password-reset tokens.
     }
 }
 

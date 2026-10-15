@@ -2,6 +2,7 @@
   <Folder Name="/Fundoo-MAIN/">
     <Project Path="BusinessLayer/BusinessLayer.csproj" />
     <Project Path="FunDo/FunDo.csproj" />
+    <Project Path="MIiddleware/Middleware.csproj" Id="2f46ba41-1c67-46d4-a643-5bd0cf6261b5" />
     <Project Path="ModelLayer/ModelLayer.csproj" />
     <Project Path="Repository/RepositoryLayer.csproj" />
   </Folder>

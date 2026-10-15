@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ModelLayer.Response
+namespace ModelLayer.Response.UserResponse
 {
     public class LoginResponseModel
     {
