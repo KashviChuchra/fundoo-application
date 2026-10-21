@@ -18,8 +18,7 @@ namespace RepositoryLayer.Service
             _fundooContext = fundooContext;
         }
 
-        public async Task<ResponseModel<string>> RegisterUserRL(
-            RegistrationModel registrationModel)
+        public async Task<ResponseModel<string>> RegisterUserRL(RegistrationModel registrationModel)
         {
             var email = registrationModel.Email.Trim();
 
@@ -60,8 +59,7 @@ namespace RepositoryLayer.Service
         {
             var email = loginModel.Email.Trim();
 
-            var user = await _fundooContext.Users
-                .FirstOrDefaultAsync(user => user.Email == email);
+            var user = await _fundooContext.Users.FirstOrDefaultAsync(user => user.Email == email);
 
             if (user == null || !BCrypt.Net.BCrypt.Verify(loginModel.Password, user.Password))
             {
@@ -88,18 +86,14 @@ namespace RepositoryLayer.Service
         {
             email = email.Trim();
 
-            return await _fundooContext.Users
-                .FirstOrDefaultAsync(user => user.Email == email);
+            return await _fundooContext.Users.FirstOrDefaultAsync(user => user.Email == email);
         }
 
-        public async Task<bool> UpdatePasswordAsync(
-            int userId, string passwordHash)
+        public async Task<bool> UpdatePasswordAsync(int userId, string passwordHash)
         {
-            var user = await _fundooContext.Users
-                .FirstOrDefaultAsync(user => user.UserId == userId);
+            var user = await _fundooContext.Users.FirstOrDefaultAsync(user => user.UserId == userId);
 
-            if (user == null)
-                return false;
+            if (user == null)   return false;
 
             user.Password = passwordHash;
 

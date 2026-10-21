@@ -127,12 +127,6 @@ namespace FunDo.Controllers
             return Ok(result);
         }
 
-        //public Task<ActionResult<ResponseModel<NoteModelResponse>>> TrashUnTrash()
-        //{
-        //    throw new NotImplementedException();
-
-        //}
-
         private bool TryGetUserId(out int userId)
         {
             return int.TryParse(User.FindFirstValue(UserIdClaim), out userId);

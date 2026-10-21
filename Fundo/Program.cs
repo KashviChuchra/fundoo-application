@@ -1,21 +1,19 @@
 using BusinessLayer.Interface;
 using BusinessLayer.Service;
+using Fundoo.ExceptionHandler;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
+using Middleware.Services.Email;
+using Middleware.Services.Jwt;
 using NLog;
 using NLog.Web;
 using RepositoryLayer.Context;
 using RepositoryLayer.Interface;
 using RepositoryLayer.Service;
-using System.Runtime.Intrinsics.X86;
 using System.Text;
-using Middleware.Services.Email;
-using Middleware.Services.Jwt;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Model;
-using static System.Net.WebRequestMethods;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+
 
 namespace FunDo
 {
@@ -40,8 +38,6 @@ namespace FunDo
 
                 // Business Layer
                 builder.Services.AddScoped<IUserBL, UserBL>();
-                //builder.Services.AddScoped<IForgotPasswordBL, ForgotPasswordBL>();
-                //builder.Services.AddScoped<IResetPasswordBL, ResetPasswordBL>();
                 builder.Services.AddScoped<INoteBL, NoteBL>();
 
                 // Middleware
@@ -117,8 +113,12 @@ namespace FunDo
                         });
                 });
 
+                builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+                builder.Services.AddProblemDetails();
 
                 var app = builder.Build();
+
+                app.UseExceptionHandler();
 
                 // Middleware
                 if (app.Environment.IsDevelopment())

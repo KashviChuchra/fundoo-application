@@ -17,7 +17,7 @@ namespace FunDo.Controllers
         }
         
 
-        [HttpPost]
+        [HttpPost("register")]
         public async Task<IActionResult> RegisterUser([FromBody] RegistrationModel registrationModel)
         {
             var response = await _userBL.RegisterUserBL(registrationModel);
@@ -38,17 +38,16 @@ namespace FunDo.Controllers
             }
             return Ok(response);
         }
+        
         [HttpPost("forgot-password")]
-        public async Task<IActionResult> ForgotPasswordAsync(
-            [FromBody] ForgotPasswordRequest request)
+        public async Task<IActionResult> ForgotPasswordAsync([FromBody] ForgotPasswordRequest request)
         {
             var response = await _userBL.ForgotPasswordAsync(request);
             return Ok(response);
         }
 
         [HttpPost("reset-password")]
-        public async Task<IActionResult> ResetPasswordAsync(
-            [FromBody] ResetPasswordRequest request)
+        public async Task<IActionResult> ResetPasswordAsync([FromBody] ResetPasswordRequest request)
         {
             var response = await _userBL.ResetPasswordAsync(request);
 
