@@ -9,7 +9,7 @@ using System.Security.Claims;
 
 namespace FunDo.Controllers
 {
-    [Authorize]
+    [Authorize] // This is called filter
     [ApiController]
     [Route("api/[controller]")]
     public class NoteController: ControllerBase

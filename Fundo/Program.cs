@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using Middleware.Services.Email;
+using Middleware.Services.Hashing;
 using Middleware.Services.Jwt;
 using NLog;
 using NLog.Web;
@@ -43,6 +44,7 @@ namespace FunDo
                 // Middleware
                 builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
                 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+                builder.Services.AddSingleton<CustomHashing>();
 
 
                 // Repository Layer

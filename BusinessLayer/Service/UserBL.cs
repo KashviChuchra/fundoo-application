@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Middleware.Services.Email;
+using Middleware.Services.Hashing;
 using Middleware.Services.Jwt;
 using ModelLayer.Request.UserRequest;
 using ModelLayer.Response.UserResponse;
@@ -20,24 +21,28 @@ namespace BusinessLayer.Service
         private readonly IEmailSender _emailSender;
         private readonly IConfiguration _configuration;
         private readonly ILogger<UserBL> _logger;
+        private readonly CustomHashing _customHasher;
 
         public UserBL(
             IUserRL userRL,
             IJwtTokenService jwtTokenService,
             IEmailSender emailSender,
             IConfiguration configuration,
-            ILogger<UserBL> logger)
+            ILogger<UserBL> logger,
+            CustomHashing customHasher)
         {
             _userRL = userRL;
             _jwtTokenService = jwtTokenService;
             _emailSender = emailSender;
             _configuration = configuration;
             _logger = logger;
+            _customHasher = customHasher;
         }
 
         public async Task<ResponseModel<string>> RegisterUserBL(
             RegistrationModel registrationModel)
         {
+            registrationModel.Password=_customHasher.HashPassword(registrationModel.Password);
             return await _userRL.RegisterUserRL(registrationModel);
         }
 
@@ -119,8 +124,7 @@ namespace BusinessLayer.Service
             }
             catch (Exception ex)
             {
-                _logger.LogError(
-                    ex, "Failed to process a password-reset request.");
+                _logger.LogError(ex, "Failed to process a password-reset request.");
 
                 return new ResponseModel<string>
                 {
@@ -130,8 +134,7 @@ namespace BusinessLayer.Service
             }
         }
 
-        public async Task<ResponseModel<string>> ResetPasswordAsync(
-            ResetPasswordRequest request)
+        public async Task<ResponseModel<string>> ResetPasswordAsync(ResetPasswordRequest request)
         {
             if (request == null ||
                 string.IsNullOrWhiteSpace(request.Token) ||
@@ -158,10 +161,10 @@ namespace BusinessLayer.Service
 
             try
             {
-                var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+                //var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+                var passwordHash = _customHasher.HashPassword(request.NewPassword);
 
-                var updated = await _userRL.UpdatePasswordAsync(
-                    userId.Value, passwordHash);
+                var updated = await _userRL.UpdatePasswordAsync(userId.Value, passwordHash);
 
                 if (!updated)
                 {
@@ -180,8 +183,7 @@ namespace BusinessLayer.Service
             }
             catch (Exception ex)
             {
-                _logger.LogError(
-                    ex, "Failed to reset the user's password.");
+                _logger.LogError(ex, "Failed to reset the user's password.");
 
                 return new ResponseModel<string>
                 {

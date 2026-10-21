@@ -6,16 +6,20 @@ using ModelLayer.Response.UserResponse;
 using RepositoryLayer.Context;
 using RepositoryLayer.Entity;
 using RepositoryLayer.Interface;
+using Middleware.Services.Hashing;
 
 namespace RepositoryLayer.Service
 {
     public class UserRL : IUserRL
     {
         private readonly FundooContext _fundooContext;
+        private readonly CustomHashing _customHasher;
 
-        public UserRL(FundooContext fundooContext)
+
+        public UserRL(FundooContext fundooContext, CustomHashing customHasher)
         {
             _fundooContext = fundooContext;
+            _customHasher = customHasher;
         }
 
         public async Task<ResponseModel<string>> RegisterUserRL(RegistrationModel registrationModel)
@@ -39,7 +43,8 @@ namespace RepositoryLayer.Service
                 FirstName = registrationModel.FirstName,
                 LastName = registrationModel.LastName,
                 Email = email,
-                Password = BCrypt.Net.BCrypt.HashPassword(registrationModel.Password),
+                //Password = BCrypt.Net.BCrypt.HashPassword(registrationModel.Password),
+                Password = registrationModel.Password,
                 PhoneNumber = registrationModel.ContactNo
             };
 
@@ -61,7 +66,8 @@ namespace RepositoryLayer.Service
 
             var user = await _fundooContext.Users.FirstOrDefaultAsync(user => user.Email == email);
 
-            if (user == null || !BCrypt.Net.BCrypt.Verify(loginModel.Password, user.Password))
+            if (user == null || //!BCrypt.Net.BCrypt.Verify(loginModel.Password, user.Password)) 
+               !_customHasher.VerifyPassword(loginModel.Password, user.Password))
             {
                 return new ResponseModel<LoginResponseModel>
                 {
