@@ -12,7 +12,7 @@ namespace RepositoryLayer.Interface
 {
     public interface INoteRL
     {
-        Task<NoteEntity> AddNoteAsync(NoteCreationRequest note, int userId);
+        Task<NoteEntity?> AddNoteAsync(NoteCreationRequest note, int userId);
         Task<List<NoteEntity>> ViewNotesAsync(int userId);
         Task<NoteEntity?> ViewNotesByIdAsync(NoteIdRequest note, int userId);
         Task<NoteEntity?> EditNotesByIdAsync(EditNoteRequest note, int userId);

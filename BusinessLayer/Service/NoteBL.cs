@@ -1,178 +1,71 @@
 ﻿using BusinessLayer.Interface;
+using BusinessLayer.Note.Command;
+using BusinessLayer.Note.Handler;
+using BusinessLayer.Note.Query;
 using ModelLayer.Request.NoteRequest;
 using ModelLayer.Response.NoteResponse;
 using ModelLayer.Response.UserResponse;
 using RepositoryLayer.Interface;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using BusinessLayer.Note.Command.Handler_Interface;
+
 
 namespace BusinessLayer.Service
 {
     public class NoteBL: INoteBL
     {
         private readonly INoteRL _noteRL;
-        public NoteBL(INoteRL noteRL)
+        private readonly ICreateNoteHandler _createNoteHandler;
+        private readonly IUpdateNoteHandler _updateNoteHandler;
+        private readonly IDeleteNoteHandler _deleteNoteHandler;
+        private readonly IArchiveNoteHandler _archiveNoteHandler;
+        private readonly IGetAllNotesQueryHandler _getAllNotesQueryHandler;
+        private readonly IGetNotesByIdQueryHandler _getNotesByIdQueryHandler;
+
+
+
+        public NoteBL(INoteRL noteRL, 
+            ICreateNoteHandler createNoteHandler, IUpdateNoteHandler updateNoteHandler, 
+            IDeleteNoteHandler deleteNoteHandler, IArchiveNoteHandler archiveNoteHandler,
+            IGetAllNotesQueryHandler getAllNotesQueryHandler,IGetNotesByIdQueryHandler getNotesByIdQueryHandler)
         {
             _noteRL = noteRL;
+            _createNoteHandler = createNoteHandler;
+            _updateNoteHandler = updateNoteHandler;
+            _deleteNoteHandler = deleteNoteHandler;
+            _archiveNoteHandler = archiveNoteHandler;
+            _getAllNotesQueryHandler = getAllNotesQueryHandler;
+            _getNotesByIdQueryHandler = getNotesByIdQueryHandler;
         }
 
         public async Task<ResponseModel<NoteModelResponse>> AddNoteAsync(NoteCreationRequest note, int userId)
         {
-            var new_note = await _noteRL.AddNoteAsync(note, userId);
-
-            var response = new NoteModelResponse
-            {
-                NoteId = new_note.NoteId,
-                Title = new_note.Title,
-                Description = new_note.Description,
-                Colour = new_note.Colour,
-                IsArchived = new_note.IsArchived,
-                IsDeleted = new_note.IsDeleted
-            };
-
-            return new ResponseModel<NoteModelResponse>
-            {
-                Success = true,
-                Message = "Note created successfully",
-                Data = response
-            };
+            var command = new CreateNoteCommand(note, userId);
+            return await _createNoteHandler.HandleAsync(command);
         }
         public async Task<ResponseModel<List<NoteModelResponse>>> ViewNotesAsync(int userId)
         {
-            var notes = await _noteRL.ViewNotesAsync(userId);
-            var response = notes.Select(x => new NoteModelResponse
-            {
-                NoteId = x.NoteId,
-                Title = x.Title,
-                Description = x.Description,
-                Colour = x.Colour,
-                IsArchived = x.IsArchived,
-                IsDeleted = x.IsDeleted
-            }).ToList();
-
-            return new ResponseModel<List<NoteModelResponse>>
-            {
-                Success = true,
-                Message = "Notes retrived successfully",
-                Data = response
-            };
+            var query = new GetAllNotesQuery(userId);
+            return await _getAllNotesQueryHandler.HandleAsync(query);
         }
         public async Task<ResponseModel<NoteModelResponse>> ViewNotesByIdAsync(NoteIdRequest note, int userId)
         {
-            var note_ = await _noteRL.ViewNotesByIdAsync(note, userId);
-            if (note_ == null)
-            {
-                return new ResponseModel<NoteModelResponse>
-                {
-                    Success = false,
-                    Message = "User or Note doesn't present",
-                    Data = null
-                };
-            }
-
-            var response = new NoteModelResponse
-            {
-                NoteId = note_.NoteId,
-                Title = note_.Title,
-                Description = note_.Description,
-                Colour = note_.Colour,
-                IsArchived = note_.IsArchived,
-                IsDeleted = note_.IsDeleted
-            };
-            return new ResponseModel<NoteModelResponse>
-            {
-                Success = true,
-                Message = "Notes retrived by Note Id successfully",
-                Data = response
-            };
+            var query = new GetNotesByIdQuery(note, userId);
+            return await _getNotesByIdQueryHandler.HandleAsync(query);
         }
         public async Task<ResponseModel<NoteModelResponse>> EditNotesByIdAsync(EditNoteRequest note, int userId)
         {
-            var note_ = await _noteRL.EditNotesByIdAsync(note, userId);
-            if (note_ == null)
-            {
-                return new ResponseModel<NoteModelResponse>
-                {
-                    Success = false,
-                    Message = "Note Or User doesn't exist",
-                    Data = null
-                };
-            }
-            var response = new NoteModelResponse()
-            {
-                NoteId = note_.NoteId,
-                Title = note_.Title,
-                Description = note_.Description,
-                Colour = note_.Colour,
-                IsArchived = note_.IsArchived,
-                IsDeleted = note_.IsDeleted
-            };
-            return new ResponseModel<NoteModelResponse>
-            {
-                Success=true,
-                Message="Note Updated Successfully!",
-                Data=response
-            };
+            var command = new UpdateNoteCommand(note, userId);
+            return await _updateNoteHandler.HandleAsync(command);
         }
         public async Task<ResponseModel<NoteModelResponse>> DeleteNotesByIdAsync(NoteIdRequest note, int userId)
         {
-            var note_ = await _noteRL.DeleteNotesByIdAsync(note, userId);
-            if (note_==null)
-            {
-                return new ResponseModel<NoteModelResponse>
-                {
-                    Success = false,
-                    Message = "Note Or User doesn't exist",
-                    Data = null
-                };
-            }
-            var response = new NoteModelResponse
-            {
-                NoteId = note_.NoteId,
-                Title = note_.Title,
-                Description = note_.Description,
-                Colour = note_.Colour,
-                IsArchived = note_.IsArchived,
-                IsDeleted = note_.IsDeleted
-            };
-            return new ResponseModel<NoteModelResponse>
-            {
-                Success = true,
-                Message = "Note Deleted Successfully!",
-                Data=response
-            };
+            var command = new DeleteNoteCommand(note, userId);
+            return await _deleteNoteHandler.HandleAsync(command);
         }
         public async Task<ResponseModel<NoteModelResponse>> ArchiveNoteAsync(NoteIdRequest noteId, int userId)
         {
-            var note_ = await _noteRL.ArchiveNoteAsync(noteId, userId);
-            if (note_ == null)
-            {
-                return new ResponseModel<NoteModelResponse>
-                {
-                    Success = false,
-                    Message = "Note Or User doesn't exist",
-                    Data = null
-                };
-            }
-            var response = new NoteModelResponse
-            {
-                NoteId = note_.NoteId,
-                Title = note_.Title,
-                Description = note_.Description,
-                Colour = note_.Colour,
-                IsArchived = note_.IsArchived,
-                IsDeleted = note_.IsDeleted
-            };
-            return new ResponseModel<NoteModelResponse>
-            {
-                Success = true,
-                Message = "Note Archieved Successfully!",
-                Data = response
-            };
+            var command = new ArchiveNoteCommand(noteId, userId);
+            return await _archiveNoteHandler.HandleAsync(command);
         }
-       
     }
 }

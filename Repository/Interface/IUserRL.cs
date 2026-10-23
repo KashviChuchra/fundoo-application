@@ -9,8 +9,8 @@ namespace RepositoryLayer.Interface
 {
     public interface IUserRL
     {
-        Task<ResponseModel<string>> RegisterUserRL(RegistrationModel registrationModel);
-        Task<ResponseModel<LoginResponseModel>> LoginUserRL(LoginModel loginModel);
+        Task<UserEntity?> RegisterUserRL(RegistrationModel registrationModel);
+        Task<UserEntity?> LoginUserRL(LoginModel loginModel);
         Task<UserEntity?> GetUserByEmailAsync(string email);
         Task<bool> UpdatePasswordAsync(int userId, string passwordHash);
 

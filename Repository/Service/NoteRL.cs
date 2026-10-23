@@ -19,12 +19,12 @@ namespace RepositoryLayer.Service
             _fundoocontext = fundooContext;
         }
 
-        public async Task<NoteEntity> AddNoteAsync(NoteCreationRequest note, int userId)
+        public async Task<NoteEntity?> AddNoteAsync(NoteCreationRequest note, int userId)
         {
             var user_exists = await _fundoocontext.Users.AnyAsync(x => x.UserId == userId);
             if (!user_exists)
             {
-                throw new KeyNotFoundException("User Not Found");
+                return null;            
             }
             var new_note = new NoteEntity
             {

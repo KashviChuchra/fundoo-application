@@ -22,20 +22,14 @@ namespace RepositoryLayer.Service
             _customHasher = customHasher;
         }
 
-        public async Task<ResponseModel<string>> RegisterUserRL(RegistrationModel registrationModel)
+        public async Task<UserEntity?> RegisterUserRL(RegistrationModel registrationModel)
         {
             var email = registrationModel.Email.Trim();
-
-            var existingUser = await _fundooContext.Users
-                .FirstOrDefaultAsync(user => user.Email == email);
+            var existingUser = await _fundooContext.Users.FirstOrDefaultAsync(user => user.Email == email);
 
             if (existingUser != null)
             {
-                return new ResponseModel<string>
-                {
-                    Success = false,
-                    Message = "An account with this email already exists."
-                };
+                return null;
             }
 
             var user = new UserEntity
@@ -51,16 +45,10 @@ namespace RepositoryLayer.Service
             await _fundooContext.Users.AddAsync(user);
             await _fundooContext.SaveChangesAsync();
 
-            return new ResponseModel<string>
-            {
-                Success = true,
-                Message = "User registered successfully.",
-                Data = "Registration successful."
-            };
+            return user;
         }
 
-        public async Task<ResponseModel<LoginResponseModel>> LoginUserRL(
-            LoginModel loginModel)
+        public async Task<UserEntity?> LoginUserRL(LoginModel loginModel)
         {
             var email = loginModel.Email.Trim();
 
@@ -69,23 +57,10 @@ namespace RepositoryLayer.Service
             if (user == null || //!BCrypt.Net.BCrypt.Verify(loginModel.Password, user.Password)) 
                !_customHasher.VerifyPassword(loginModel.Password, user.Password))
             {
-                return new ResponseModel<LoginResponseModel>
-                {
-                    Success = false,
-                    Message = "Invalid email or password."
-                };
+                return null;
             }
 
-            return new ResponseModel<LoginResponseModel>
-            {
-                Success = true,
-                Message = "Login successful.",
-                Data = new LoginResponseModel
-                {
-                    UserId = user.UserId,
-                    Email = user.Email
-                }
-            };
+            return user;
         }
 
         public async Task<UserEntity?> GetUserByEmailAsync(string email)

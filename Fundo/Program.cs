@@ -1,5 +1,12 @@
 using BusinessLayer.Interface;
+using BusinessLayer.Note.Command;
+using BusinessLayer.Note.Command.Handler_Interface;
+using BusinessLayer.User.Command.HandlerInterface;
+using BusinessLayer.Note.Handler;
+using BusinessLayer.Note.Query;
 using BusinessLayer.Service;
+using BusinessLayer.User.Command;
+using BusinessLayer.User.Query;
 using Fundoo.ExceptionHandler;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -36,6 +43,21 @@ namespace FunDo
                 // N log
                 builder.Logging.ClearProviders();
                 builder.Host.UseNLog();
+
+                // Notes CQRS
+                builder.Services.AddScoped<ICreateNoteHandler,CreateNoteHandler>();
+                builder.Services.AddScoped<IUpdateNoteHandler,UpdateNoteHandler>();
+                builder.Services.AddScoped<IDeleteNoteHandler,DeleteNoteHandler>();
+                builder.Services.AddScoped<IArchiveNoteHandler,ArchiveNoteHandler>();
+
+                builder.Services.AddScoped<IGetAllNotesQueryHandler,GetAllNotesQueryHandler>();
+                builder.Services.AddScoped<IGetNotesByIdQueryHandler, GetNotesByIdQueryHandler>();
+
+                // User CQRS 
+                builder.Services.AddScoped<IRegisterUserHandler,RegisterUserHandler>();
+                builder.Services.AddScoped<ILoginUserQueryHandler,LoginUserQueryHandler>();
+                builder.Services.AddScoped<IForgotPasswordHandler,ForgotPasswordHandler>();
+                builder.Services.AddScoped<IResetPasswordHandler,ResetPasswordHandler>();
 
                 // Business Layer
                 builder.Services.AddScoped<IUserBL, UserBL>();
